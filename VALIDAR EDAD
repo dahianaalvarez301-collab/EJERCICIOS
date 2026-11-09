@@ -1,0 +1,97 @@
+	Funcion edad = ValidarEdad()
+Definir edad Como Entero
+Repetir
+Escribir "Ingrese edad (0 - 110):"
+Leer edad
+Hasta Que edad >= 0 Y edad <= 110
+FinFuncion
+
+Funcion imc = ValidarIMC()
+	Definir imc Como Real
+	Repetir
+	Escribir "Ingrese IMC (10.0 - 60.0):"
+	Leer imc
+	Hasta Que imc >= 10.0 Y imc <= 60.0
+FinFuncion
+
+Funcion total = CalcularTarifa(edad, imc)
+	Definir tarifaBase, descuento, recargo, total Como Real
+	tarifaBase = 45000
+	descuento = 0
+	recargo = 0
+	
+	Si edad < 12 O edad >= 65 Entonces
+descuento = tarifaBase * 0.20
+	FinSi
+	
+	Si imc >= 30.0 Entonces
+recargo = 12000
+	FinSi
+	
+	total = (tarifaBase - descuento) + recargo
+FinFuncion
+
+SubProceso RegistrarPaciente(edad, imc, recaudo Por Referencia, vulnerables Por Referencia, riesgo_imc Por Referencia)
+	Definir aPagar Como Real
+	aPagar <- CalcularTarifa(edad, imc)
+	recaudo <- recaudo + aPagar
+	
+	Si edad < 12 O edad >= 65 Entonces
+vulnerables = vulnerables + 1
+	FinSi
+	
+	Si imc >= 30.0 Entonces
+riesgo_imc = riesgo_imc + 1
+	FinSi
+	
+	Escribir "Total a pagar: $", aPagar
+FinSubProceso
+
+Algoritmo CentroMedicoSaludIntegral
+	Definir opcion, pacientes, vulnerables, riesgo_imc, edad Como Entero
+	Definir recaudo, imc, imcMayor Como Real
+	
+	pacientes = 0
+	vulnerables = 0
+	riesgo_imc = 0
+	recaudo = 0
+	imcMayor = 0
+	
+	Repetir
+	Escribir ""
+	Escribir "--- MENU PRINCIPAL ---"
+	Escribir "[1] Evaluar Paciente"
+	Escribir "[2] Ver Informe Epidemiologico del Dia"
+	Escribir "[3] Cerrar Turno"
+	Escribir "Seleccione una opcion:"
+	Leer opcion
+	
+	Segun opcion Hacer
+	1:
+	edad = ValidarEdad()
+	imc =  ValidarIMC()
+	
+	RegistrarPaciente(edad, imc, recaudo, vulnerables, riesgo_imc)
+	pacientes = pacientes + 1
+Si imc > imcMayor Entonces
+	imcMayor = imc
+	FinSi
+	2:
+Escribir ""
+Escribir "=== INFORME EPIDEMIOLOGICO ==="
+Escribir "Total dinero cobrado: $", recaudo
+Escribir "Total pacientes atendidos: ", pacientes
+	Si pacientes > 0 Entonces
+Escribir "Porcentaje con subsidio por edad: ", (vulnerables / pacientes) * 100, "%"
+Escribir "Pacientes con riesgo por IMC (>= 30): ", riesgo_imc
+Escribir "Registro del IMC mas alto: ", imcMayor
+	Sino
+Escribir "No hay pacientes registrados todavia."
+FinSi
+	3:
+Escribir "Cerrando turno del sistema..."
+De Otro Modo:
+Escribir "Opcion no valida."
+	FinSegun
+	Hasta Que opcion = 3
+FinAlgoritmo
